@@ -24,7 +24,7 @@ module RCat
 
         if number_all_lines? or ( number_significant_lines? and
                                   status.significant? )
-          print "%6d\t%s" % [status.lineno, line]
+          print_numbered_line(status.lineno, line)
         else
           print line
         end
@@ -32,6 +32,12 @@ module RCat
         status.increment unless number_significant_lines? and
                                 status.insignificant?
       end
+    end
+    
+    private
+    
+    def print_numbered_line(number, line)
+      print "%6d\t%s" % [number, line]
     end
   end
 end
