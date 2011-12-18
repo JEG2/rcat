@@ -1,5 +1,5 @@
 module RCat
-  class Display
+  class Renderer
     def initialize(params)
       @line_numbering_style   = params[:line_numbering_style]
       @squeeze_extra_newlines = params[:squeeze_extra_newlines]

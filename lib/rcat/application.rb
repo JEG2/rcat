@@ -3,7 +3,7 @@ module RCat
     def initialize(argv)
       @params, @files = parse_options(argv)
 
-      @display        = RCat::Display.new(@params)
+      @display        = RCat::Renderer.new(@params)
     end
 
     def run
