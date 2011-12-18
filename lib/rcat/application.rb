@@ -14,6 +14,8 @@ module RCat
           File.open(filename) { |f| @display.render(f) }
         end 
       end
+    rescue Errno::ENOENT => error
+      abort "rcat: #{error.message}"
     end
 
     def parse_options(argv)
@@ -25,6 +27,8 @@ module RCat
       end.parse(argv)
 
       [params, files]
+    rescue OptionParser::InvalidOption => error
+      abort "rcat: #{error.message}\nusage: rcat [-bns] [file ...]"
     end
   end
 end
