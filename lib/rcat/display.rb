@@ -4,53 +4,42 @@ module RCat
       @line_numbering_style   = params[:line_numbering_style]
       @squeeze_extra_newlines = params[:squeeze_extra_newlines]
     end
+        
+    def squeeze_extra_newlines?
+      @squeeze_extra_newlines
+    end
+    
+    def number_all_lines?
+      @line_numbering_style == :all_lines
+    end
+    
+    def number_significant_lines?
+      @line_numbering_style == :significant_lines
+    end
 
     def render(data)
-      @line_number = 1
+      data.each_with_object(RendererStatus.new) do |line, status|
+        status.update( line, squeeze_extra_newlines?,
+                             number_significant_lines? )
+        next if squeeze_extra_newlines? and status.extra_newline?
 
-      lines = data.lines
-      loop { render_line(lines) }
+        if number_all_lines? or ( number_significant_lines? and
+                                  status.significant? )
+          print_labeled_line(status.lineno, line)
+        else
+          print_unlabeled_line(line)
+        end
+      end
     end
 
     private
 
-    attr_reader :line_numbering_style, :squeeze_extra_newlines, :line_number
-
-    def render_line(lines)
-      current_line = lines.next 
-      current_line_is_blank = current_line.chomp.empty?
-
-      case line_numbering_style
-      when :all_lines
-        print_labeled_line(current_line)
-        increment_line_number  
-      when :significant_lines
-        if current_line_is_blank
-          print_unlabeled_line(current_line)
-        else
-          print_labeled_line(current_line)
-          increment_line_number
-        end
-      else
-        print_unlabeled_line(current_line)
-        increment_line_number
-      end
-
-      if squeeze_extra_newlines && current_line_is_blank
-         lines.next while lines.peek.chomp.empty?
-      end
-    end
-
-    def print_labeled_line(line)
-      print "#{line_number.to_s.rjust(6)}\t#{line}" 
+    def print_labeled_line(label, line)
+      print "%6d\t%s" % [label, line]
     end
 
     def print_unlabeled_line(line)
       print line
-    end
-
-    def increment_line_number
-      @line_number += 1
     end
   end
 end
